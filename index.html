@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galileo Thermometer Simulation</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <header class="header">
+    <h1>Galileo Thermometer</h1>
+    <p class="subtitle">An interactive simulation of the elegant 17th-century instrument</p>
+  </header>
+
+  <main class="main">
+    <section class="thermometer-panel">
+      <div class="thermometer-frame">
+        <div class="thermometer-glass">
+          <div class="liquid" id="liquid"></div>
+          <div class="bubbles-container" id="bubbles"></div>
+          <div class="spheres" id="spheres"></div>
+          <div class="glass-shine"></div>
+        </div>
+        <div class="base">
+          <div class="base-shine"></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label for="temp-slider" class="control-label">
+          Temperature
+          <span class="temp-value" id="temp-display">20°C</span>
+        </label>
+        <input
+          type="range"
+          id="temp-slider"
+          min="5"
+          max="30"
+          value="20"
+          step="0.5"
+          aria-valuemin="5"
+          aria-valuemax="30"
+          aria-valuenow="20"
+        />
+        <div class="temp-markers">
+          <span>5°C</span>
+          <span>30°C</span>
+        </div>
+      </div>
+
+      <div class="dedication">
+        <p>
+          This little simulation is dedicated for my best friend — the one who once found
+          a real Galileo thermometer at a flea market and fell in love with it on the spot,
+          even though she couldn’t take it home that day. </br>
+          I hope this digital version brings a smile to your face every time you move the slider.
+        </p>
+      </div>
+    </section>
+
+    <aside class="info-panel">
+      <div class="info-card">
+        <h2>How it Works</h2>
+        <p>
+          A Galileo thermometer contains a sealed glass cylinder filled with a clear liquid
+          and several sealed glass spheres of slightly different densities. Each sphere is
+          attached to a small metal tag engraved with a temperature.
+        </p>
+        <p>
+          As the temperature of the surrounding air changes, the density of the liquid
+          changes more than the density of the spheres. When the liquid becomes denser
+          (cooler), the spheres float higher. When the liquid becomes less dense (warmer),
+          the spheres sink.
+        </p>
+        <p>
+          The temperature is read from the lowest floating sphere (or the average of the
+          lowest floating and highest sinking sphere when they are close together).
+        </p>
+      </div>
+
+      <div class="info-card accent">
+        <h2>A Bit of History</h2>
+        <p>
+          Named after Galileo Galilei, who discovered that the density of a liquid changes
+          with temperature. The instrument as we know it was refined in the 17th century by
+          the Accademia del Cimento in Florence. It remains one of the most beautiful ways
+          to display temperature.
+        </p>
+      </div>
+
+      <div class="info-card tip">
+        <h2>Try It</h2>
+        <p>
+          Drag the slider slowly. Watch the spheres rise and fall as the liquid density
+          changes. The currently indicated temperature is shown above the slider and
+          highlighted on the tags.
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <p>Interactive simulation · Inspired by the classic Galileo thermometer</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
