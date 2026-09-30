@@ -1,6 +1,6 @@
 /**
  * Galileo Thermometer Simulation
- * Spheres sink or float based on liquid density, which changes with temperature.
+ * Physics restored to match the original working version.
  */
 
 const SPHERES = [
@@ -13,10 +13,10 @@ const SPHERES = [
 ];
 
 const TUBE_HEIGHT = 440;
-const TOP_MARGIN = 24;
-const BOTTOM_MARGIN = 30;
+const TOP_MARGIN = 22;
+const BOTTOM_MARGIN = 28;
 const SPHERE_SIZE = 42;
-const GAP = 8; // space between stacked spheres
+const GAP = 6;
 
 const slider = document.getElementById("temp-slider");
 const tempDisplay = document.getElementById("temp-display");
@@ -51,7 +51,8 @@ function createSpheres() {
 
     const inner = document.createElement("div");
     inner.className = "sphere-inner";
-    inner.style.background = `radial-gradient(circle at 32% 28%, ${lighten(s.color, 40)}, ${s.color} 55%, ${darken(s.color, 30)})`;
+    inner.style.background =
+      `radial-gradient(circle at 32% 28%, ${lighten(s.color, 40)}, ${s.color} 55%, ${darken(s.color, 30)})`;
 
     const tag = document.createElement("span");
     tag.className = "tag";
@@ -59,16 +60,16 @@ function createSpheres() {
 
     el.appendChild(inner);
     el.appendChild(tag);
-    el.style.top = `${TOP_MARGIN}px`;
     spheresContainer.appendChild(el);
   });
 }
 
 /**
- * Real Galileo behavior:
- * - Sphere calibrated at T is denser than liquid when ambient > T → sinks
- * - Sphere is less dense when ambient < T → floats
- * - Reading = lowest floating sphere (or avg of lowest floater & highest sinker)
+ * Same logic as the first working zip:
+ * - temp above ambient → sink
+ * - temp below ambient → float
+ * - Floaters keep SPHERES order (higher labels first → higher in the tube)
+ *   so at ~22°C you get: 20, 16, 12, 8 up top and 24, 28 at the bottom.
  */
 function updatePositions(temp) {
   const spheres = Array.from(spheresContainer.children);
@@ -76,37 +77,32 @@ function updatePositions(temp) {
   const sinkers = [];
 
   SPHERES.forEach((s, i) => {
-    // small hysteresis band around exact temp
-    if (s.temp > temp + 0.6) {
-      sinkers.push(i); // denser → sinks
+    if (s.temp > temp + 0.8) {
+      sinkers.push(i);
+    } else if (s.temp < temp - 0.8) {
+      floaters.push(i);
     } else {
-      floaters.push(i); // less dense or equal → floats
+      floaters.push(i);
     }
   });
 
-  // Sort floaters so lower-temp (lighter) ones sit higher
-  floaters.sort((a, b) => SPHERES[a].temp - SPHERES[b].temp);
-  // Sort sinkers so higher-temp (denser) ones sit lower
-  sinkers.sort((a, b) => SPHERES[a].temp - SPHERES[b].temp);
+  // Do NOT re-sort floaters — keep push order (28→8), so higher temps sit higher
+  // among the floating group (matches first version).
 
-  // Place floaters from the top downward
   floaters.forEach((idx, order) => {
     const el = spheres[idx];
-    const top = TOP_MARGIN + order * (SPHERE_SIZE + GAP);
-    el.style.top = `${top}px`;
+    el.style.top = `${TOP_MARGIN + order * (SPHERE_SIZE + GAP)}px`;
     el.classList.remove("sinking");
   });
 
-  // Place sinkers from the bottom upward
+  // Push order is high→low temp; place so higher temps sit lower (28 at very bottom)
   sinkers.forEach((idx, order) => {
     const el = spheres[idx];
-    const fromBottom = (sinkers.length - 1 - order) * (SPHERE_SIZE + GAP);
-    const top = TUBE_HEIGHT - BOTTOM_MARGIN - SPHERE_SIZE - fromBottom;
-    el.style.top = `${top}px`;
+    const fromBottom = order * (SPHERE_SIZE + GAP);
+    el.style.top = `${TUBE_HEIGHT - BOTTOM_MARGIN - SPHERE_SIZE - fromBottom}px`;
     el.classList.add("sinking");
   });
 
-  // Highlight sphere closest to current temperature
   spheres.forEach((el) => el.classList.remove("active"));
   let activeIdx = 0;
   let bestDiff = Infinity;
@@ -143,6 +139,7 @@ function updateDisplay(temp) {
 }
 
 function createBubbles() {
+  bubblesContainer.innerHTML = "";
   for (let i = 0; i < 7; i++) {
     const b = document.createElement("div");
     b.className = "bubble";
@@ -163,14 +160,12 @@ function onTempChange() {
   updateLiquid(currentTemp);
 }
 
-// Init
 createSpheres();
 createBubbles();
 onTempChange();
 
 slider.addEventListener("input", onTempChange);
 
-// Gentle auto-demo until user interacts
 let demoRunning = true;
 let demoDir = 1;
 const demoInterval = setInterval(() => {

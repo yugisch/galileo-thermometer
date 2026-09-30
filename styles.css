@@ -412,11 +412,10 @@ input[type="range"]::-moz-range-thumb {
 
 .dedication p {
   color: var(--text-muted);
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   line-height: 1.65;
   text-align: left;
   font-style: italic;
-  opacity: 0.9;
 }
 
 .info-panel {
